@@ -1,7 +1,14 @@
 #Baseado em: http://pythonclub.com.br/gerenciando-banco-dados-sqlite3-python-parte1.html
 import sqlite3
 
-#Criando conexão com banco de dados
 conn = sqlite3.connect('clientes.db')
-#Fechando conexão
+
+cursor = conn.cursor()
+
+id_cliente = 8
+
+cursor.execute("""DELETE FROM clientes WHERE id = ?""", (id_cliente,))
+
+conn.commit()
+
 conn.close()

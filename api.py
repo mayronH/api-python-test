@@ -1,3 +1,4 @@
+#Baseado em: https://medium.com/@nataniel.paiva/cria%C3%A7%C3%A3o-de-uma-api-rest-com-python-76696d17bfb9
 from flask import Flask, request, jsonify
 from flask_restful import Resource, Api
 from sqlalchemy import create_engine
