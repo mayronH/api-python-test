@@ -23,7 +23,7 @@ class Users(Resource):
         name = request.json['name']
         email = request.json['email']
 
-        conn.execute("INSERT INTO user VALUES(NULL, '{0}', '{1}')".format(name,email))
+        conn.execute("INSERT INTO user VALUES(NULL, '{0}', '{1}')".format(name, email))
 
         query = conn.execute("SELECT * FROM user ORDER BY id DESC LIMIT 1")
 
