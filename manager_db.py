@@ -172,11 +172,100 @@ class ClienteDB(ClienteDB):
             print("Erro ao inserir novo registro. O CPF e email devem ser únicos.")
             return False
 
+class PessoaDB(object):
+    tb_name = 'pessoas'
+
+    def __init__(self):
+        self.db = Connect('pessoas.db')
+        self.tb_name
+
+    def criar_schema(self, schema_name='sql/pessoas_schema.sql'):
+        try:
+            with open(schema_name, 'rt') as f:
+                schema = f.read()
+                self.db.cursor.executescript(schema)
+        except sqlite3.Error:
+            print("Error: A tabela %s já existe" % self.tb_name)
+            return False
+
+    def inserir_csv(self, file_name='csv/cidades.csv'):
+        try:
+            reader = csv.reader(
+                open(file_name, 'rt'), delimiter=',')
+
+            linha = (reader,)
+            for linha in reader:
+                self.db.cursor.execute("""INSERT INTO cidades (cidade, uf) VALUES (?, ?)""", linha)
+            
+            self.db.commit_db()
+
+        except sqlite3.IntegrityError:
+            print('Erro ao inserir cidades')
+            return False
+    
+    def gen_cidade(self):
+        sql = "SELECT COUNT(*) FROM cidades"
+        query = self.db.cursor.execute(sql)
+        return query.fetchone()[0]
+
+    def inserir_random(self, repeat=5):
+        lista = []
+
+        for i in range(repeat):
+            fname = names.get_first_name()
+            lname = names.get_last_name()
+            email = fname[0].lower() + "." + lname.lower() + "@gmail.com"
+            idcidade = random.randint(1, self.gen_cidade())
+            lista.append((fname, lname, email, idcidade))
+
+        try:
+            self.db.cursor.executemany("""INSERT INTO pessoas(nome, sobrenome, email, idcidade) 
+                VALUES (?, ?, ?, ?)""", lista)
+            
+            self.db.commit_db()
+
+        except sqlite3.IntegrityError:
+            print('Erro ao inserir dados')
+            return False
+
+    def read_all(self):
+        sql = "SELECT * FROM pessoas INNER JOIN cidades ON pessoas.idcidade = cidades.id"
+        query = self.db.cursor.execute(sql)
+        return query.fetchall()
+
+    def print_all(self):
+        lista = self.read_all()
+        # for p in lista:
+        #     print(p)
+        print('{:>3s} {:15s} {:15s} {:>21s} {:15s} {:s}'.format(
+            'id', 'nome', 'sobrenome', 'email', 'cidade', 'dtcriacao'
+        ))
+        for pessoa in lista:
+            print('{:>3d} {:15s} {:15s} {:>21s} {:15s} {:s}'.format(
+                pessoa[0], pessoa[1], pessoa[2], pessoa[3], pessoa[7], pessoa[5]
+            ))
+        
+    def table_list(self):
+        lista = self.db.cursor.execute("""SELECT name FROM sqlite_master WHERE type='table' ORDER BY name""")
+        print("Tabelas: ")
+        for tabela in lista.fetchall():
+            # print("{}".format(tabela))
+            print("%s" % (tabela))
+
+    def fechar_conexao(self):
+        self.db.close_db()
+
 if __name__ == '__main__':
-    c = ClienteDB()
-    c.criar_schema()
-    # c.inserir_registro()
-    # c.inserir_com_lista()
-    # c.inserir_de_arquivo()
-    c.deletar(11)
-    c.print_all_clients()
+    # c = ClienteDB()
+    # c.criar_schema()
+    # # c.inserir_registro()
+    # # c.inserir_com_lista()
+    # # c.inserir_de_arquivo()
+    # c.deletar(11)
+    # c.print_all_clients()
+    p = PessoaDB()
+    # p.criar_schema()
+    # p.inserir_csv()
+    # p.inserir_random()
+    p.print_all()
+    p.table_list()
