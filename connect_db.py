@@ -14,6 +14,10 @@ class Connect(object):
             self.data = self.cursor.fetchone()
         except sqlite3.Error:
             print("Erro ao conectar com o banco")
+
+    def commit_db(self):
+        if self.conn:
+            self.conn.commit()
     
     def close_db(self):
         if self.conn:
@@ -21,8 +25,11 @@ class Connect(object):
 
 class ClienteDB(object):
 
+    tb_name = 'clientes'
+
     def __init__(self):
         self.db = Connect('clientes_inter.db')
+        self.tb_name
 
     def close_connection(self):
         self.db.close_db()
