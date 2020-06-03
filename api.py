@@ -20,8 +20,8 @@ class Users(Resource):
     def post(self):
         conn = db_connect.connect()
         
-        name = request.json['name']
-        email = request.json['email']
+        name = request.args['name']
+        email = request.args['email']
 
         conn.execute("INSERT INTO user VALUES(NULL, '{0}', '{1}')".format(name, email))
 
@@ -32,9 +32,9 @@ class Users(Resource):
 
     def put(self):
         conn = db_connect.connect()
-        id = request.json['id']
-        name = request.json['name']
-        email = request.json['email']
+        id = request.args['id']
+        name = request.args['name']
+        email = request.args['email']
 
         conn.execute("UPDATE user SET name='" + str(name) + "', email='" + str(email) + "' WHERE id=%d" % int(id))
 
